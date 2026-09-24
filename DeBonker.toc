@@ -1,0 +1,4 @@
+## Interface: 30300
+## Title: DeBonker
+## Notes: Adds a "Debonk" button to cleanly wipe out mail from Minigob Manabonk with a safe 0.5s server delay.
+DeBonker.lua
