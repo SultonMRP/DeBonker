@@ -24,6 +24,14 @@ end
 
 -- Timer logic: waits 0.50 seconds between deletions to prevent server desync
 local timeSinceLastDelete = 0
+
+local function StopWipe()
+    loopTicker:Hide()
+    timeSinceLastDelete = 0
+    debonkBtn:Enable()
+    debonkBtn:SetText("Debonk")
+end
+
 loopTicker:SetScript("OnUpdate", function(self, elapsed)
     timeSinceLastDelete = timeSinceLastDelete + elapsed
     if timeSinceLastDelete >= 0.50 then
@@ -31,9 +39,7 @@ loopTicker:SetScript("OnUpdate", function(self, elapsed)
         -- Check if there is still mail to delete. If not, turn off the loop.
         local itemsRemaining = DeleteNextTarget()
         if not itemsRemaining then
-            self:Hide()
-            debonkBtn:Enable()
-            debonkBtn:SetText("Debonk")
+            StopWipe()
         end
     end
 end)
@@ -62,14 +68,15 @@ visibilityWatcher:SetScript("OnEvent", function(self, event)
                     debonkBtn:Show()
                 else
                     debonkBtn:Hide()
-                    loopTicker:Hide() -- Safely stop if you swap tabs mid-wipe
+                    StopWipe() -- Safely stop if you swap tabs mid-wipe
                 end
             end)
             self.hooked = true
         end
+        StopWipe() -- Reset leftover "Clearing..." if the last session was interrupted
         debonkBtn:Show()
     elseif event == "MAIL_CLOSED" then
+        StopWipe() -- Stop timer and restore the button if you walk away mid-wipe
         debonkBtn:Hide()
-        loopTicker:Hide() -- Stop timer if you walk away from the mailbox
     end
 end)
